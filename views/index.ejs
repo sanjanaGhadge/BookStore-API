@@ -1,0 +1,36 @@
+<form id="searchForm">
+    <input type="text" id="searchQuery" placeholder="Search Books..." required>
+    <select id="searchType">
+        <option value="title">Title</option>
+        <option value="author">Author</option>
+        <option value="isbn">ISBN</option>
+    </select>
+    <button type="submit">🔍 Search</button>
+</form>
+
+<h2>Search Results:</h2>
+<ul id="searchResults"></ul>
+
+<script>
+    document.getElementById("searchForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const query = document.getElementById("searchQuery").value;
+        const type = document.getElementById("searchType").value;
+        const response = await fetch(`/search/${type}/${query}`);
+        const data = await response.json();
+
+        const resultsContainer = document.getElementById("searchResults");
+        resultsContainer.innerHTML = ""; // Clear previous results
+
+        if (Array.isArray(data) && data.length > 0) {
+            data.forEach(book => {
+                resultsContainer.innerHTML += `<li>${book.title} by ${book.author} (ISBN: ${book.isbn})</li>`;
+            });
+        } else if (data.title) {
+            resultsContainer.innerHTML = `<li>${data.title} by ${data.author} (ISBN: ${data.isbn})</li>`;
+        } else {
+            resultsContainer.innerHTML = `<li>No results found</li>`;
+        }
+    });
+</script>

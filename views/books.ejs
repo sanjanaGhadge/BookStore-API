@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Add a CSS file for styling -->
+</head>
+<body>
+    <h1>📚 Welcome to the Bookstore</h1>
+
+    <!-- Search Form -->
+    <form action="/books" method="GET">
+        <input type="text" name="title" placeholder="Search by Title">
+        <input type="text" name="author" placeholder="Search by Author">
+        <input type="text" name="isbn" placeholder="Search by ISBN">
+        <button type="submit">🔍 Search</button>
+    </form>
+
+    <br>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Reviews</th>
+                <% if (isAuthenticated) { %>
+                    <th>Actions</th>
+                <% } %>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (books.length > 0) { %>
+                <% books.forEach(book => { %>
+                    <tr>
+                        <td><%= book.title %></td>
+                        <td><%= book.author %></td>
+                        <td><%= book.isbn %></td>
+                        <td>
+                            <ul>
+                                <% book.reviews.forEach((review, index) => { %>
+                                    <li>
+                                        <%= review %>
+                                        <% if (isAuthenticated) { %> 
+                                            <form action="/books/<%= book._id %>/reviews/<%= index %>/delete" method="POST" style="display:inline;">
+                                                <button type="submit">❌ Delete</button>
+                                            </form>
+                                        <% } %>
+                                    </li>
+                                <% }); %>
+                            </ul>
+
+                            <% if (isAuthenticated) { %>
+                                <!-- Form to add a new review (Only for logged-in users) -->
+                                <form action="/books/<%= book._id %>/reviews" method="POST">
+                                    <input type="text" name="review" placeholder="Add a review" required>
+                                    <button type="submit">➕ Add</button>
+                                </form>
+                            <% } else { %>
+                                <p>🔒 <a href="/login">Login</a> to add or delete reviews.</p>
+                            <% } %>
+                        </td>
+
+                        <% if (isAuthenticated) { %>
+                            <td>
+                                <form action="/books/<%= book._id %>/delete" method="POST">
+                                    <button type="submit">🗑 Delete Book</button>
+                                </form>
+                            </td>
+                        <% } %>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="5" style="text-align:center;">No books found.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+    <br>
+    <% if (isAuthenticated) { %>
+        <a href="/logout">🚪 Logout</a>
+    <% } else { %>
+        <a href="/login">🔑 Login</a>
+    <% } %>
+</body>
+</html>
